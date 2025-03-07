@@ -43,7 +43,7 @@ def fazer_request(url, params=None):
     return resultado
 
 def main():
-    nome = 'Yan'
+    nome =  input('Digite um nome: ')
     dict_estados = pegar_ids_estados()
     dict_frequencias = pegar_frequencia_nome_estados(nome)
     estados_ordenados = sorted(dict_estados.items(), key=lambda x: dict_frequencias[x[0]], reverse=True)
