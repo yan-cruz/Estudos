@@ -39,7 +39,7 @@ fields = (
     f"adaccounts.limit(100){{"
     f"name,"
     f"insights.time_range({{'since':'{since_date}','until':'{until_date}'}}){{"
-    f"spend,purchase_roas"
+    f"spend,purchase_roas,actions,action_values"
     f"}}"
     f"}}"
 )
@@ -62,6 +62,7 @@ for account in response.get('adaccounts', {}).get('data', []):
     # Verificar se há insights disponíveis
     insights_data = account.get('insights', {}).get('data', [])
     if insights_data:
+        # Investimento
         insights = insights_data[0]
         cliente['investimento'] = float(insights.get('spend', 0.0))
         
@@ -69,13 +70,24 @@ for account in response.get('adaccounts', {}).get('data', []):
         purchase_roas = insights.get('purchase_roas', [])
         cliente['roas'] = float(purchase_roas[0]['value']) if purchase_roas else 0.0
 
-        # Ações relevantes
-        actions = {}
-        if 'actions' in insights and insights['actions']:
-            actions = {action['action_type']: int(action['value']) for action in insights['actions'] if 'action_type' in action and 'value' in action}
+        # Compras
+        actions = insights.get('actions', [])
+        cliente['compras'] = 0
 
-        cliente['compras'] = actions.get('purchase', 0)
-        cliente['adicoes_carrinho'] = actions.get('add_to_cart', 0)
+        for action in actions:
+            if action.get('action_type') == 'purchase':
+                cliente['compras'] = int(float(action.get('value', 0)))
+                break
+
+        # Valor de conversão
+        action_values = insights.get('action_values', [])
+        cliente['retorno'] = 0
+
+        for action in action_values:
+            if action.get('action_type') == 'purchase':
+                cliente['retorno'] = float(action.get('value', 0))
+                break
+
     else:
         # Caso não haja insights, definir valores padrão
         cliente['investimento'] = 0.0

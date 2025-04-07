@@ -35,7 +35,7 @@ fields = (
     f"adaccounts.limit(100){{"
     f"name,"
     f"insights.time_range({{'since':'{since_date}','until':'{until_date}'}}){{"
-    f"spend,purchase_roas"
+    f"spend,purchase_roas,actions,action_values"
     f"}}"
     f"}}"
 )
