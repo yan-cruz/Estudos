@@ -1,5 +1,4 @@
 import os
-from pprint import pprint
 from requests.auth import HTTPBasicAuth
 import streamlit as st
 import requests
@@ -8,6 +7,7 @@ import dotenv
 dotenv.load_dotenv()
 
 def autenticar():
+    '''Usada para autenticar o cliente na API do Spotify'''
     client_id = os.environ['CLIENT_ID']
     client_secret = os.environ['CLIENT_SECRET']
 
@@ -18,7 +18,7 @@ def autenticar():
         'grant_type': 'client_credentials'
     }
 
-    response = requests.post(url=url, data=body, auth=auth)
+    response = requests.post(url=url, data=body, auth=auth, timeout=10)
 
     try:
         response.raise_for_status()
@@ -30,13 +30,14 @@ def autenticar():
         return token
 
 def busca_artista(nome_artista, headers):
+    '''Realiza a busca do artista pesquisado, retornando o primeiro resultado'''
     url = 'https://api.spotify.com/v1/search'
     params = {
         'q': nome_artista,
         'type': 'artist'
     }
 
-    response = requests.get(url=url, headers=headers, params=params)
+    response = requests.get(url=url, headers=headers, params=params, timeout=10)
     try:
         melhor_resposta = response.json()['artists']['items'][0]
     except IndexError:
@@ -44,18 +45,21 @@ def busca_artista(nome_artista, headers):
     return melhor_resposta
 
 def busca_top_musicas(id_artist, headers):
+    '''Busca as músicas mais ouvidas do artista escolhido'''
     url = f'https://api.spotify.com/v1/artists/{id_artist}/top-tracks'
 
-    response = requests.get(url=url, headers=headers)
+    response = requests.get(url=url, headers=headers, timeout=10)
     return response.json()['tracks']
 
 def converter_ms_para_min_seg(ms):
+    '''Converte a duração da música, útil para unir posteriormente ao nome'''
     segundos = ms / 1000
     minutos = int(segundos // 60)
     segundos = int(segundos % 60)
     return f'{minutos:02}:{segundos:02}'
 
 def main():
+    '''Main da aplicação'''
     st.title('Web API - Top Tracks de um Artista')
     st.write('Dados via Spotify (fonte: https://developer.spotify.com/documentation/web-api)')
 

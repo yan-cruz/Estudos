@@ -5,7 +5,8 @@ import requests
 import dotenv
 
 def fazer_request(url, params=None):
-    response = requests.get(url, params=params)
+    '''Retorna os dados do local escolhido'''
+    response = requests.get(url, params=params, timeout=10)
 
     try:
         response.raise_for_status()
@@ -17,6 +18,7 @@ def fazer_request(url, params=None):
     return resultado
 
 def pegar_tempo(local):
+    '''Retorna os dados do clima do local'''
     dotenv.load_dotenv()
     token = os.environ['OPENWEATHER_TOKEN']
 
@@ -31,6 +33,7 @@ def pegar_tempo(local):
     return dados_tempo
 
 def main():
+    '''Main da aplicação'''
     st.title('Web API - Dados do Clima')
     st.write('Dados via OpenWeather (fonte: https://openweathermap.org/current)')
 
@@ -51,8 +54,6 @@ def main():
     icone = dados_tempo['weather'][0]['icon']
 
     icone_url =  f'https://openweathermap.org/img/wn/{icone}@2x.png'
-
-    # st.metric(label='Clima Atual', value=clima_atual.title())
 
     st.markdown('<span style="font-size: 14px; margin: 0;">Clima Atual</span>', unsafe_allow_html=True)
     st.markdown(
